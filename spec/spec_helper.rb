@@ -1,0 +1,1 @@
+require "dirty_delta"
