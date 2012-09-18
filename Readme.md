@@ -1,5 +1,7 @@
 Additional real/virtual attribute dirty tracking independent of ActiveRecords
 
+This a wrap up of some legacy code so it can be refactored/tested, not recommeneded for use yet :)
+
 Install
 =======
 
@@ -8,7 +10,10 @@ Install
 Usage
 =====
 
-    CODE EXAMPLE
+    class User < ActiveRecord::Base
+      include DirtyDelta::Extension
+      dirty_delta :columns => [:name], :attributes => [:full_name]
+    end
 
 Author
 ======
