@@ -1,25 +1,25 @@
-require "dirty_delta/version"
+require "delta_changes/version"
 
-module DirtyDelta
+module DeltaChanges
   module Extension
     def self.included(base)
       base.extend(ClassMethods)
-      base.cattr_accessor :dirty_delta_options
+      base.cattr_accessor :delta_changes_options
       base.attribute_method_suffix '_delta_changed?', '_delta_change', '_delta_was', '_delta_will_change!'
-      base.alias_method_chain :write_attribute, :delta_dirty
+      base.alias_method_chain :write_attribute, :delta_changes
     end
 
     module ClassMethods
-      def dirty_delta(options)
-        self.dirty_delta_options = options
-        #define_virtual_attribute_delta_methods
+      def delta_changes(options)
+        self.delta_changes_options = options
+        define_virtual_attribute_delta_methods
       end
 
       #
       # Provide for delta tracking of virtual (non-column) attributes.
       #
       def define_virtual_attribute_delta_methods
-        dirty_delta_options[:attributes].each do |tracked_attribute|
+        delta_changes_options[:attributes].each do |tracked_attribute|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
             def #{tracked_attribute}_delta_changed?
               attribute_delta_changed?('#{tracked_attribute}')
@@ -52,7 +52,7 @@ module DirtyDelta
     ####################################
 
     # Reset attribute changes
-    def reset_dirty_delta
+    def reset_delta_changes
       delta_changed_attributes.clear
     end
 
@@ -92,7 +92,7 @@ module DirtyDelta
 
     # Handle <tt>*_will_change!</tt> for +method_missing+.
     def attribute_delta_will_change!(attr, options = {})
-      attribute_value = if self.class.dirty_delta_options[:attributes].include?(attr)
+      attribute_value = if self.class.delta_changes_options[:attributes].include?(attr)
         value = send(attr)
         value.duplicable? ? value.clone : value
       else
@@ -102,10 +102,10 @@ module DirtyDelta
     end
 
     # Wrap write_attribute to remember original attribute value.
-    def write_attribute_with_delta_dirty(attr, value)
+    def write_attribute_with_delta_changes(attr, value)
       attr = attr.to_s
 
-      if self.class.dirty_delta_options[:columns].include?(attr)
+      if self.class.delta_changes_options[:columns].include?(attr)
         # The attribute already has an unsaved change.
         if delta_changed_attributes.include?(attr)
           old = delta_changed_attributes[attr]

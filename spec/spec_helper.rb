@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "dirty_delta"
+require "delta_changes"
 require "active_record"
 
 # connect
@@ -19,10 +19,10 @@ end
 
 # create models
 class User < ActiveRecord::Base
-  include DirtyDelta::Extension
+  include DeltaChanges::Extension
   attr_accessor :foo, :bar
 
-  dirty_delta :columns => ["name"], :attributes => ["foo"]
+  delta_changes :columns => ["name"], :attributes => ["foo"]
 
   def full_name
     "Mr. #{name}"

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dirty_delta (0.0.0)
+    delta_changes (0.0.0)
 
 GEM
   remote: http://rubygems.org/
@@ -26,7 +26,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (= 2.3.14)
-  dirty_delta!
+  delta_changes!
   rake
   rspec (~> 2)
   sqlite3

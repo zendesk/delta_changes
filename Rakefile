@@ -6,7 +6,7 @@ end
 
 # extracted from https://github.com/grosser/project_template
 rule /^version:bump:.*/ do |t|
-  file = "lib/dirty_delta/version.rb"
+  file = "lib/delta_changes/version.rb"
 
   sh "git status | grep 'nothing to commit'" # ensure we are not dirty
   index = ["major", "minor", "patch"].index(t.name.split(':').last)

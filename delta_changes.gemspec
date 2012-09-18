@@ -1,9 +1,9 @@
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-name = "dirty_delta"
+name = "delta_changes"
 require "#{name}/version"
 
-Gem::Specification.new name, DirtyDelta::VERSION do |s|
-  s.summary = "Additional real/virtual attribute dirty tracking independent of ActiveRecords"
+Gem::Specification.new name, DeltaChanges::VERSION do |s|
+  s.summary = "Additional real/virtual attribute change tracking independent of ActiveRecords"
   s.authors = ["Michael Grosser"]
   s.email = "michael@grosser.it"
   s.homepage = "http://github.com/grosser/#{name}"

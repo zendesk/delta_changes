@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe DirtyDelta do
+describe DeltaChanges do
   it "has a VERSION" do
-    DirtyDelta::VERSION.should =~ /^[\.\da-z]+$/
+    DeltaChanges::VERSION.should =~ /^[\.\da-z]+$/
   end
 
   it "should not create methods on unspecified attributes" do
