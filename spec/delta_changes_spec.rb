@@ -25,20 +25,28 @@ describe DeltaChanges do
       User.new.delta_changes.should == {}
     end
 
-    it "should be filled by column changes" do
+    it "should be filled by tracked column changes" do
       User.new(:name => "Peter").delta_changes.should == {"name"=>[nil, "Peter"]}
     end
 
-    it "should not be filled other column changes" do
+    it "should be filled by tracked number column change" do
+      User.new(:score => 5).delta_changes.should == {"score"=>[nil, 5]}
+    end
+
+    it "should be filled by tracked number column change that have the wrong type" do
+      User.new(:score => "5").delta_changes.should == {"score"=>[nil, 5]}
+    end
+
+    it "should not be filled by untracked column changes" do
       User.new(:email => "Peter").delta_changes.should == {}
     end
 
-    it "should not be filled attribute changes" do
+    it "should not be filled implicit tracked attribute changes" do
       user = User.new(:foo => 1)
       user.delta_changes.should == {}
     end
 
-    it "should be filled by explicit attribute changes" do
+    it "should be filled by explicit tracked attribute changes" do
       user = User.new(:foo => 1)
       user.foo_delta_will_change!
       user.foo = 2
@@ -48,6 +56,19 @@ describe DeltaChanges do
     it "should not mess with normal changes" do
       User.new(:email => "EMAIL", :name => "NAME", :foo => "FOO").changes.should ==
         {"email"=>[nil, "EMAIL"], "name"=>[nil, "NAME"]}
+    end
+
+    it "should not track non-changes on tracked columns" do
+      user = User.create!(:score => 5).reload
+      user.reset_delta_changes
+
+      user.delta_changes.should == {}
+
+      user.score = 5
+      user.delta_changes.should == {}
+
+      user.score = "5"
+      user.delta_changes.should == {}
     end
   end
 end

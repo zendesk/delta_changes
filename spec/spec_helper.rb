@@ -13,6 +13,7 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :users do |t|
     t.string :name
     t.string :email
+    t.integer :score
     t.timestamps
   end
 end
@@ -22,7 +23,7 @@ class User < ActiveRecord::Base
   include DeltaChanges::Extension
   attr_accessor :foo, :bar
 
-  delta_changes :columns => ["name"], :attributes => ["foo"]
+  delta_changes :columns => ["name", "score"], :attributes => ["foo"]
 
   def full_name
     "Mr. #{name}"
