@@ -41,31 +41,18 @@ module DeltaChanges
       end
     end
 
-    def delta_changed
-      delta_changed_attributes.keys
+    def delta_changes
+      delta_changed_attributes.keys.inject({}) { |h, attr| h[attr] = attribute_delta_change(attr); h }
     end
 
-    def delta_changes
-      delta_changed.inject({}) { |h, attr| h[attr] = attribute_delta_change(attr); h }
+    def delta_changes?
+      delta_changed_attributes.keys.present?
     end
 
     ####################################
 
-    # Reset attribute changes
-    def reset_delta_changes
+    def reset_delta_changes!
       delta_changed_attributes.clear
-    end
-
-    def attributes_changed?
-      !delta_changed_attributes.empty?
-    end
-
-    def was(field)
-      self.send(field.to_s + '_delta_was')
-    end
-
-    def updated?(field)
-      self.send(field.to_s + '_delta_changed?')
     end
 
     private
@@ -117,27 +104,7 @@ module DeltaChanges
       end
 
       # Carry on.
-      write_attribute_with_dirty(attr, value)
-    end
-
-    def field_changed?(attr, old, value)
-      if column = column_for_attribute(attr)
-        if column.type == :integer && column.null && (old.nil? || old == 0)
-          # For nullable integer columns, NULL gets stored in database for blank (i.e. '') values.
-          # Hence we don't record it as a change if the value changes from nil to ''.
-          # If an old value of 0 is set to '' we want this to get changed to nil as otherwise it'll
-          # be typecast back to 0 (''.to_i => 0)
-          value = nil if value.blank?
-        else
-          value = column.type_cast(value)
-        end
-      end
-
-      if column && column.type == :integer
-        old != column.type_cast(value)
-      else
-        old != value
-      end
+      write_attribute_with_dirty(attr, value) # TODO this looks like it should be write_attribute_without_delta_changes
     end
   end
 end

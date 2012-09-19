@@ -60,7 +60,7 @@ describe DeltaChanges do
 
     it "should not track non-changes on tracked columns" do
       user = User.create!(:score => 5).reload
-      user.reset_delta_changes
+      user.reset_delta_changes!
 
       user.delta_changes.should == {}
 
