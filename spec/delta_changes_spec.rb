@@ -58,6 +58,31 @@ describe DeltaChanges do
         {"email"=>[nil, "EMAIL"], "name"=>[nil, "NAME"]}
     end
 
+    it "should not reset columns on save" do
+      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
+      user.delta_changes.should == {"name"=>[nil, "NAME"]}
+    end
+
+    it "should not reset columns on update" do
+      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
+      user.update_attributes(:name => "NAME-2")
+      user.delta_changes.should == {"name"=>[nil, "NAME-2"]}
+    end
+
+    # that might change, I'd consider this a bug ... but just documenting for now
+    it "should not reset columns on reload" do
+      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
+      user.reload
+      user.delta_changes.should == {"name"=>[nil, "NAME"]}
+    end
+
+    it "should have previouse value from db" do
+      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
+      user = User.find(user)
+      user.name = "NAME-2"
+      user.delta_changes.should == {"name"=>["NAME", "NAME-2"]}
+    end
+
     it "should not track non-changes on tracked columns" do
       user = User.create!(:score => 5).reload
       user.reset_delta_changes!

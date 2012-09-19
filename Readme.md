@@ -1,6 +1,5 @@
 Additional real/virtual attribute change tracking independent of ActiveRecords
 
-This a wrap up of some legacy code so it can be refactored/tested, not recommeneded for use yet :)
 
 Install
 =======
@@ -14,6 +13,18 @@ Usage
       include DeltaChanges::Extension
       delta_changes :columns => [:name], :attributes => [:full_name]
     end
+
+    user.name = "bar"
+    user.delta_changes # => {"name" => [nil, "bar"]}
+
+    user.full_name_will_change!
+    user.delta_changes # => {"name" => [nil, "bar"], "full_name" => [nil, "Mr. Bar"]}
+
+    user.save!
+    user.delta_changes # => {"name" => [nil, "bar"], "full_name" => [nil, "Mr. Bar"]}
+
+    user.reset_delta_changes!
+    user.delta_changes # => {}
 
 Author
 ======
