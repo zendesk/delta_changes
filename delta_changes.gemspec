@@ -8,5 +8,6 @@ Gem::Specification.new name, DeltaChanges::VERSION do |s|
   s.email = "michael@grosser.it"
   s.homepage = "http://github.com/grosser/#{name}"
   s.files = `git ls-files`.split("\n")
+  s.add_runtime_dependency "activerecord"
   s.license = "MIT"
 end

@@ -103,8 +103,7 @@ module DeltaChanges
         end
       end
 
-      # Carry on.
-      write_attribute_with_dirty(attr, value) # TODO this looks like it should be write_attribute_without_delta_changes
+      write_attribute_without_delta_changes(attr, value)
     end
   end
 end

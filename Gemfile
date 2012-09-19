@@ -1,7 +1,7 @@
 source :rubygems
 gemspec
 
-gem "activerecord", "2.3.14"
+gem "appraisal"
 gem "rake"
 gem "rspec", "~>2"
 gem "sqlite3"
