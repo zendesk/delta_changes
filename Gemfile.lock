@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    delta_changes (0.0.0)
+    delta_changes (0.0.1)
       activerecord
 
 GEM
