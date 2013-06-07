@@ -96,14 +96,19 @@ module DeltaChanges
         # The attribute already has an unsaved change.
         if delta_changed_attributes.include?(attr)
           old = delta_changed_attributes[attr]
-          delta_changed_attributes.delete(attr) unless field_changed?(attr, old, value)
+          delta_changed_attributes.delete(attr) unless delta_changes_field_changed?(attr, old, value)
         else
           old = clone_attribute_value(:read_attribute, attr)
-          delta_changed_attributes[attr] = old if field_changed?(attr, old, value)
+          delta_changed_attributes[attr] = old if delta_changes_field_changed?(attr, old, value)
         end
       end
 
       write_attribute_without_delta_changes(attr, value)
+    end
+
+    def delta_changes_field_changed?(attr, old, value)
+      @delta_changes_field_changed ||= defined?(field_changed?)
+      @delta_changes_field_changed ? field_changed?(attr, old, value) : _field_changed?(attr, old, value) # rails 3.0-3.1 vs 3.2
     end
   end
 end

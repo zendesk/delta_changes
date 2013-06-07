@@ -1,15 +1,5 @@
-appraise "rails2" do
-  version = "2.3.14"
-  gem 'activerecord', version
-end
-
-appraise "rails30" do
-  version = "3.2.3"
-  gem 'activerecord', version
-end
-
-
-appraise "rails32" do
-  version = "3.2.3"
-  gem 'activerecord', version
+["2.3.18", "3.0.20", "3.1.12", "3.2.13"].each do |version|
+  appraise "rails#{version[0..2].sub(".","")}" do
+    gem 'activerecord', version
+  end
 end
