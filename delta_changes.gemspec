@@ -6,7 +6,7 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.email = 'michael@grosser.it'
   s.homepage = 'http://github.com/grosser/delta_changes'
   s.license = 'MIT'
-  s.files = `git ls-files`.split('\n')
+  s.files = Dir.glob('lib/**/*')
 
   s.add_runtime_dependency 'activerecord', '>= 3.2.22', '< 5.1'
 
