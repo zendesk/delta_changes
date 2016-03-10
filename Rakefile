@@ -1,12 +1,7 @@
-require "bundler/setup"
-require "bundler/gem_tasks"
-require "appraisal"
-require "bump/tasks"
+require 'bundler/setup'
+require 'bump/tasks'
+require 'wwtd/tasks'
 
 task :spec do
-  sh "rspec spec/"
-end
-
-task :default do
-  sh "rake appraisal:install && rake appraisal spec"
+  sh 'rspec spec/'
 end
