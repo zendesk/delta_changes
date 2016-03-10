@@ -2,7 +2,7 @@ PATH
   remote: /Users/pschambacher/Code/zendesk/delta_changes
   specs:
     delta_changes (1.0.0)
-      activerecord (~> 3.2.22)
+      activerecord (>= 3.2.22, < 5.1)
 
 GEM
   remote: https://rubygems.org/
@@ -21,6 +21,7 @@ GEM
     arel (3.0.3)
     builder (3.0.4)
     bump (0.5.3)
+    byebug (8.2.2)
     diff-lcs (1.2.5)
     i18n (0.7.0)
     multi_json (1.11.2)
@@ -48,6 +49,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 3.2.22)
   bump
+  byebug
   delta_changes!
   rake
   rspec

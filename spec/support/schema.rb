@@ -4,6 +4,6 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
     t.string :email
     t.integer :score
-    t.timestamps
+    t.timestamps null: false
   end
 end

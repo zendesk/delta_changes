@@ -8,11 +8,12 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.license = 'MIT'
   s.files = `git ls-files`.split('\n')
 
-  s.add_runtime_dependency 'activerecord', '~> 3.2.22'
+  s.add_runtime_dependency 'activerecord', '>= 3.2.22', '< 5.1'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'bump'
   s.add_development_dependency 'wwtd'
+  s.add_development_dependency 'byebug'
 end

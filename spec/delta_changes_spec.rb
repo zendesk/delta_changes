@@ -79,9 +79,9 @@ describe DeltaChanges do
       expect(user.delta_changes).to eq('name' => [nil, 'NAME'])
     end
 
-    it 'should have previouse value from db' do
+    it 'should have previous value from db' do
       user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
-      user = User.find(user)
+      user = User.find(user.id)
       user.name = 'NAME-2'
       expect(user.delta_changes).to eq('name' => ['NAME', 'NAME-2'])
     end
