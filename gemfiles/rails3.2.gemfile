@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gemspec path: Bundler.root.sub('/gemfiles', '')
+
+gem 'activerecord', '~> 3.2.22'

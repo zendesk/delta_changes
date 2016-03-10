@@ -6,7 +6,8 @@ module DeltaChanges
       base.extend(ClassMethods)
       base.cattr_accessor :delta_changes_options
       base.attribute_method_suffix '_delta_changed?', '_delta_change', '_delta_was', '_delta_will_change!'
-      base.alias_method_chain :write_attribute, :delta_changes
+      base.send(:alias_method, :write_attribute_without_delta_changes, :write_attribute)
+      base.send(:alias_method, :write_attribute, :write_attribute_with_delta_changes)
     end
 
     module ClassMethods
@@ -20,23 +21,23 @@ module DeltaChanges
       #
       def define_virtual_attribute_delta_methods
         delta_changes_options[:attributes].each do |tracked_attribute|
-          class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-            def #{tracked_attribute}_delta_changed?
-              attribute_delta_changed?('#{tracked_attribute}')
+          class_eval do
+            define_method("#{tracked_attribute}_delta_changed?") do
+              attribute_delta_changed?(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_change
-              attribute_delta_change('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_change") do
+              attribute_delta_change(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_was
-              attribute_delta_was('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_was") do
+              attribute_delta_was(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_will_change!
-              attribute_delta_will_change!('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_will_change!") do
+              attribute_delta_will_change!(tracked_attribute)
             end
-          RUBY
+          end
         end
       end
     end
@@ -92,23 +93,31 @@ module DeltaChanges
     def write_attribute_with_delta_changes(attr, value)
       attr = attr.to_s
 
-      if self.class.delta_changes_options[:columns].include?(attr)
-        # The attribute already has an unsaved change.
-        if delta_changed_attributes.include?(attr)
-          old = delta_changed_attributes[attr]
-          delta_changed_attributes.delete(attr) unless delta_changes_field_changed?(attr, old, value)
-        else
-          old = clone_attribute_value(:read_attribute, attr)
-          delta_changed_attributes[attr] = old if delta_changes_field_changed?(attr, old, value)
-        end
+      unless self.class.delta_changes_options[:columns].include?(attr)
+        return write_attribute_without_delta_changes(attr, value)
       end
 
-      write_attribute_without_delta_changes(attr, value)
+      # The attribute already has an unsaved change.
+      if delta_changed_attributes.include?(attr)
+        old = delta_changed_attributes[attr]
+        write_attribute_without_delta_changes(attr, value)
+        delta_changed_attributes.delete(attr) unless delta_changes_field_changed?(attr, old, value)
+      else
+        old = clone_attribute_value(:read_attribute, attr)
+        write_attribute_without_delta_changes(attr, value)
+        delta_changed_attributes[attr] = old if delta_changes_field_changed?(attr, old, value)
+      end
     end
 
     def delta_changes_field_changed?(attr, old, value)
-      @delta_changes_field_changed ||= defined?(field_changed?)
-      @delta_changes_field_changed ? field_changed?(attr, old, value) : _field_changed?(attr, old, value) # rails 3.0-3.1 vs 3.2
+      return true if old.nil? && !value.nil?
+      if ActiveRecord::VERSION::STRING < '4.2.0'
+        _field_changed?(attr, old, value)
+      elsif ActiveRecord::VERSION::MAJOR < 5
+        _field_changed?(attr, old)
+      else
+        changes_include?(attr)
+      end
     end
   end
 end

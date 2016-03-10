@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: /Users/pschambacher/Code/zendesk/delta_changes
   specs:
     delta_changes (1.0.0)
       activerecord (>= 3.2.22, < 5.1)

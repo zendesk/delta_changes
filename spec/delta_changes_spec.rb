@@ -1,99 +1,102 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe DeltaChanges do
-  it "has a VERSION" do
-    DeltaChanges::VERSION.should =~ /^[\.\da-z]+$/
+  it 'has a VERSION' do
+    expect(DeltaChanges::VERSION).to match(/^[\.\da-z]+$/)
   end
 
-  it "should not create methods on unspecified attributes" do
-    # TODO broken, but that might be rails 2 ...
-    #expect{
-    #  User.new.email_delta_will_change!
-    #}.to raise_error
-
+  it 'should not create methods on unspecified attributes' do
     expect{
       User.new.bar_delta_will_change!
-    }.to raise_error
+    }.to raise_error(NoMethodError)
 
     expect{
       User.new.does_not_exist_delta_will_change!
-    }.to raise_error
+    }.to raise_error(NoMethodError)
   end
 
-  describe "#delta_changes" do
-    it "should be empty on unchanged" do
-      User.new.delta_changes.should == {}
+  describe '#delta_changes' do
+    it 'should be empty on unchanged' do
+      changes = User.new.delta_changes
+      expect(changes).to eq({})
     end
 
-    it "should be filled by tracked column changes" do
-      User.new(:name => "Peter").delta_changes.should == {"name"=>[nil, "Peter"]}
+    it 'should be filled by tracked column changes' do
+      changes = User.new(:name => 'Peter').delta_changes
+      expect(changes).to eq('name' => [nil, 'Peter'])
     end
 
-    it "should be filled by tracked number column change" do
-      User.new(:score => 5).delta_changes.should == {"score"=>[nil, 5]}
+    it 'should be filled by tracked number column change' do
+      changes = User.new(:score => 5).delta_changes
+      expect(changes).to eq('score' => [nil, 5])
     end
 
-    it "should be filled by tracked number column change that have the wrong type" do
-      User.new(:score => "5").delta_changes.should == {"score"=>[nil, 5]}
+    it 'should be filled by tracked number column change that have the wrong type' do
+      changes = User.new(:score => '5').delta_changes
+      expect(changes).to eq('score' => [nil, 5])
     end
 
-    it "should not be filled by untracked column changes" do
-      User.new(:email => "Peter").delta_changes.should == {}
+    it 'should not be filled by untracked column changes' do
+      changes = User.new(:email => 'Peter').delta_changes
+      expect(changes).to eq({})
     end
 
-    it "should not be filled implicit tracked attribute changes" do
+    it 'should not be filled implicit tracked attribute changes' do
       user = User.new(:foo => 1)
-      user.delta_changes.should == {}
+      expect(user.delta_changes).to eq({})
     end
 
-    it "should be filled by explicit tracked attribute changes" do
+    it 'should be filled by explicit tracked attribute changes' do
       user = User.new(:foo => 1)
       user.foo_delta_will_change!
       user.foo = 2
-      user.delta_changes.should == {"foo"=>[1, 2]}
+      expect(user.delta_changes).to eq('foo' => [1, 2])
     end
 
-    it "should not mess with normal changes" do
-      User.new(:email => "EMAIL", :name => "NAME", :foo => "FOO").changes.should ==
-        {"email"=>[nil, "EMAIL"], "name"=>[nil, "NAME"]}
+    it 'should not mess with normal changes' do
+      changes = User.new(:email => 'EMAIL', :name => 'NAME', :foo => 'FOO').changes
+      expect(changes).to eq(
+        'email' => [nil, 'EMAIL'],
+        'name'  => [nil, 'NAME']
+      )
     end
 
-    it "should not reset columns on save" do
-      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
-      user.delta_changes.should == {"name"=>[nil, "NAME"]}
+    it 'should not reset columns on save' do
+      user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
+      expect(user.delta_changes).to eq('name' => [nil, 'NAME'])
     end
 
-    it "should not reset columns on update" do
-      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
-      user.update_attributes(:name => "NAME-2")
-      user.delta_changes.should == {"name"=>[nil, "NAME-2"]}
+    it 'should not reset columns on update' do
+      user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
+      user.update_attributes(:name => 'NAME-2')
+      expect(user.delta_changes).to eq('name' => [nil, 'NAME-2'])
     end
 
     # that might change, I'd consider this a bug ... but just documenting for now
-    it "should not reset columns on reload" do
-      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
+    it 'should not reset columns on reload' do
+      user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
       user.reload
-      user.delta_changes.should == {"name"=>[nil, "NAME"]}
+      expect(user.delta_changes).to eq('name' => [nil, 'NAME'])
     end
 
-    it "should have previouse value from db" do
-      user = User.create!(:name => "NAME", :foo => "FOO", :bar => "BAR")
-      user = User.find(user)
-      user.name = "NAME-2"
-      user.delta_changes.should == {"name"=>["NAME", "NAME-2"]}
+    it 'should have previous value from db' do
+      user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
+      user = User.find(user.id)
+      user.name = 'NAME-2'
+      expect(user.delta_changes).to eq('name' => ['NAME', 'NAME-2'])
     end
 
-    it "should not track non-changes on tracked columns" do
+    it 'should not track non-changes on tracked columns' do
       user = User.create!(:score => 5).reload
       user.reset_delta_changes!
 
-      user.delta_changes.should == {}
+      expect(user.delta_changes).to eq({})
 
       user.score = 5
-      user.delta_changes.should == {}
+      expect(user.delta_changes).to eq({})
 
-      user.score = "5"
-      user.delta_changes.should == {}
+      user.score = '5'
+      expect(user.delta_changes).to eq({})
     end
   end
 end
