@@ -21,23 +21,23 @@ module DeltaChanges
       #
       def define_virtual_attribute_delta_methods
         delta_changes_options[:attributes].each do |tracked_attribute|
-          class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-            def #{tracked_attribute}_delta_changed?
-              attribute_delta_changed?('#{tracked_attribute}')
+          class_eval do
+            define_method("#{tracked_attribute}_delta_changed?") do
+              attribute_delta_changed?(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_change
-              attribute_delta_change('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_change") do
+              attribute_delta_change(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_was
-              attribute_delta_was('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_was") do
+              attribute_delta_was(tracked_attribute)
             end
 
-            def #{tracked_attribute}_delta_will_change!
-              attribute_delta_will_change!('#{tracked_attribute}')
+            define_method("#{tracked_attribute}_delta_will_change!") do
+              attribute_delta_will_change!(tracked_attribute)
             end
-          RUBY
+          end
         end
       end
     end
