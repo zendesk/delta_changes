@@ -46,6 +46,11 @@ describe DeltaChanges do
       expect(user.delta_changes).to eq({})
     end
 
+    it 'should not be filled if a nil attribute changes to empty string' do
+      user = User.new(:score => '')
+      expect(user.delta_changes).to eq({})
+    end
+
     it 'should be filled by explicit tracked attribute changes' do
       user = User.new(:foo => 1)
       user.foo_delta_will_change!
