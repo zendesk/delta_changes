@@ -1,7 +1,7 @@
 PATH
-  remote: /Users/pschambacher/Code/zendesk/delta_changes
+  remote: ../
   specs:
-    delta_changes (1.0.0)
+    delta_changes (2.0.0)
       activerecord (>= 3.2.22, < 5.1)
 
 GEM
@@ -62,4 +62,4 @@ DEPENDENCIES
   wwtd
 
 BUNDLED WITH
-   1.11.2
+   1.13.6
