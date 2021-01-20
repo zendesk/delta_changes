@@ -84,7 +84,7 @@ module DeltaChanges
         value = send(attr)
         value.duplicable? ? value.clone : value
       else
-        options[:from] || clone_attribute_value(:read_attribute, attr)
+        options[:from] || respond_to?(:clone_attribute_value) ? clone_attribute_value(:read_attribute, attr) : read_attribute(attr).dup
       end
       delta_changed_attributes[attr] = attribute_value
     end
@@ -103,7 +103,7 @@ module DeltaChanges
         write_attribute_without_delta_changes(attr, value)
         delta_changed_attributes.delete(attr) unless delta_changes_field_changed?(attr, old, value)
       else
-        old = clone_attribute_value(:read_attribute, attr)
+        old = respond_to?(:clone_attribute_value) ? clone_attribute_value(:read_attribute, attr) : read_attribute(attr).dup
         write_attribute_without_delta_changes(attr, value)
         delta_changed_attributes[attr] = old if delta_changes_field_changed?(attr, old, value)
       end

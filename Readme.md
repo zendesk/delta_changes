@@ -35,4 +35,4 @@ Author
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
 License: MIT<br/>
-[![Build Status](https://travis-ci.org/grosser/delta_changes.png)](https://travis-ci.org/grosser/delta_changes)
+[![Build Status](https://github.com/zendesk/delta_changes/workflows/spec/badge.svg)](https://travis-ci.org/zendesk/delta_changes/actions)
