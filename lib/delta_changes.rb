@@ -111,12 +111,13 @@ module DeltaChanges
 
     def delta_changes_field_changed?(attr, old, value)
       return true if !old.present? && value.present?
+
       if ActiveRecord::VERSION::STRING < '4.2.0'
         _field_changed?(attr, old, value)
       elsif ActiveRecord::VERSION::MAJOR < 5
         _field_changed?(attr, old)
       else
-        changes_include?(attr)
+        self[attr] != old
       end
     end
   end
