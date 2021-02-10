@@ -103,5 +103,24 @@ describe DeltaChanges do
       user.score = '5'
       expect(user.delta_changes).to eq({})
     end
+
+    context 'when a tracked column is changed multiple times in a single db transaction' do
+      context 'and the final value is the same as the original' do
+        context 'and delta_changes is reset between each change' do
+          it 'should be filled after each change is applied' do
+            user = User.create
+            user.changes_to_apply = [
+              {attr_name: "score", value: 5},
+              {attr_name: "score", value: nil}
+            ]
+            # triggers before_save callback to apply changes
+            user.save!
+
+            expect(user.audits.count).to eq(2)
+            expect(user.audits.last.changes.map(&:to_h)).to eq(['score' => [5, nil]])
+          end
+        end
+      end
+    end
   end
 end
