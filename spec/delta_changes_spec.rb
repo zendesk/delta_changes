@@ -104,23 +104,19 @@ describe DeltaChanges do
       expect(user.delta_changes).to eq({})
     end
 
-    context 'when a tracked column is changed multiple times in a single db transaction' do
-      context 'and the final value is the same as the original' do
-        context 'and delta_changes is reset between each change' do
-          it 'should be filled after each change is applied' do
-            user = User.create
-            user.changes_to_apply = [
-              {attr_name: "score", value: 5},
-              {attr_name: "score", value: nil}
-            ]
-            # triggers before_save callback to apply changes
-            user.save!
+    it 'can track multiple changes to a column when the final value matches the original' do
+      user = User.create
+      user.changes_to_apply = [
+        {attr_name: "score", value: 5},
+        {attr_name: "score", value: nil}
+      ]
 
-            expect(user.audits.count).to eq(2)
-            expect(user.audits.last.changes.map(&:to_h)).to eq(['score' => [5, nil]])
-          end
-        end
-      end
+      # a before_save callback (see: `./spec/support/models.rb`) will apply these changes;
+      # `reset_delta_changes!` will be called after each write to the attribute
+      user.save!
+
+      expect(user.audits.count).to eq(2)
+      expect(user.audits.last.changes.map(&:to_h)).to eq(['score' => [5, nil]])
     end
   end
 end

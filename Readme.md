@@ -33,11 +33,11 @@ user.delta_changes # => {}
 Testing
 ======
 
-To run tests with Rails 4.2: `$ rake spec`
-To run tests with Rails 5.0:
+To run tests: `$ rake spec`
+To run tests with a specific Rails version listed in `./gemfiles`, e.g. Rails 5.0:
 ```
-$ BUNDLE_GEMFILE=Gemfile.rails5 bundle
-$ BUNDLE_GEMFILE=Gemfile.rails5 rake spec`
+$ BUNDLE_GEMFILE=gemfiles/rails5.0.gemfile bundle
+$ BUNDLE_GEMFILE=gemfiles/rails5.0.gemfile rake spec`
 ```
 
 Author
