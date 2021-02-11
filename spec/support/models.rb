@@ -57,8 +57,6 @@ class Audit
 end
 
 class ChangeEvent
-  attr_reader :attr_name, :old_value, :new_value
-
   def initialize(attr_name:, old_value:, new_value:)
     @attr_name = attr_name
     @old_value = old_value
@@ -66,6 +64,6 @@ class ChangeEvent
   end
 
   def to_h
-    {attr_name => [old_value, new_value]}
+    {@attr_name => [@old_value, @new_value]}
   end
 end
