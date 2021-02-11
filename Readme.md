@@ -30,6 +30,16 @@ user.reset_delta_changes!
 user.delta_changes # => {}
 ```
 
+Testing
+======
+
+To run tests: `$ rake spec`
+
+To run tests with a specific Rails version listed in `./gemfiles`, e.g. Rails 5.0:
+```
+$ BUNDLE_GEMFILE=gemfiles/rails5.0.gemfile rake spec`
+```
+
 Author
 ======
 [Michael Grosser](http://grosser.it)<br/>

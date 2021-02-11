@@ -103,5 +103,20 @@ describe DeltaChanges do
       user.score = '5'
       expect(user.delta_changes).to eq({})
     end
+
+    it 'can track multiple changes to a column when the final value matches the original' do
+      user = User.create
+      user.changes_to_apply = [
+        {attr_name: "score", value: 5},
+        {attr_name: "score", value: nil}
+      ]
+
+      # a before_save callback (see: `./spec/support/models.rb`) will apply these changes;
+      # `reset_delta_changes!` will be called after each write to the attribute
+      user.save!
+
+      expect(user.audits.count).to eq(2)
+      expect(user.audits.last.changes.map(&:to_h)).to eq(['score' => [5, nil]])
+    end
   end
 end
