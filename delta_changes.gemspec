@@ -14,6 +14,6 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'sqlite3', '~> 1.3.6'
   s.add_development_dependency 'bump'
-  s.add_development_dependency 'wwtd'
   s.add_development_dependency 'byebug'
+  s.add_development_dependency 'matching_bundle'
 end
