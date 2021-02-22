@@ -73,7 +73,7 @@ describe DeltaChanges do
 
     it 'should not reset columns on update' do
       user = User.create!(:name => 'NAME', :foo => 'FOO', :bar => 'BAR')
-      user.update_attributes(:name => 'NAME-2')
+      user.update(:name => 'NAME-2')
       expect(user.delta_changes).to eq('name' => [nil, 'NAME-2'])
     end
 
