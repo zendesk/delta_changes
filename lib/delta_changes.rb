@@ -37,8 +37,8 @@ module DeltaChanges
               attribute_delta_was(tracked_attribute)
             end
 
-            define_method("#{tracked_attribute}_delta_will_change!") do
-              attribute_delta_will_change!(tracked_attribute)
+            define_method("#{tracked_attribute}_delta_will_change!") do |*args|
+              attribute_delta_will_change!(tracked_attribute, *args)
             end
           end
         end
@@ -131,7 +131,7 @@ module DeltaChanges
         value = send(attr)
         value.duplicable? ? value.clone : value
       else
-        options[:from] || respond_to?(:clone_attribute_value) ? clone_attribute_value(:read_attribute, attr) : read_attribute(attr).dup
+        options[:from] || (respond_to?(:clone_attribute_value) ? clone_attribute_value(:read_attribute, attr) : read_attribute(attr).dup)
       end
       delta_changed_attributes[attr] = attribute_value
     end

@@ -58,6 +58,12 @@ describe DeltaChanges do
       expect(user.delta_changes).to eq('foo' => [1, 2])
     end
 
+    it 'should accept options' do
+      user = User.new(:name => 0)
+      user.name_delta_will_change!(from: 0)
+      expect(user.delta_changes).to eq('name' => [0, "0"])
+    end
+
     it 'should not mess with normal changes' do
       changes = User.new(:email => 'EMAIL', :name => 'NAME', :foo => 'FOO').changes
       expect(changes).to eq(
