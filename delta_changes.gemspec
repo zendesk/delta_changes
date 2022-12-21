@@ -8,7 +8,7 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.license = 'MIT'
   s.files = Dir.glob('lib/**/*')
 
-  s.add_runtime_dependency 'activerecord', '>= 3.2.22', '< 6.3'
+  s.add_runtime_dependency 'activerecord', '>= 5.1', '< 6.2'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
