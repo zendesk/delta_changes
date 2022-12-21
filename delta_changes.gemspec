@@ -9,7 +9,7 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.files = Dir.glob('lib/**/*')
   s.required_ruby_version = '>= 2.6.0'
 
-  s.add_runtime_dependency 'activerecord', '>= 5.1', '< 6.2'
+  s.add_runtime_dependency 'activerecord', '>= 5.1', '< 7.1'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
