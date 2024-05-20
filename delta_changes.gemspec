@@ -7,9 +7,9 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.homepage = 'http://github.com/zendesk/delta_changes'
   s.license = 'MIT'
   s.files = Dir.glob('lib/**/*')
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.0'
 
-  s.add_runtime_dependency 'activerecord', '>= 5.1', '< 7.1'
+  s.add_runtime_dependency 'activerecord', '>= 6.0', '< 7.2'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
