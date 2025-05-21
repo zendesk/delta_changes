@@ -6,7 +6,7 @@ module DeltaChanges
       base.extend(ClassMethods)
       base.cattr_accessor :delta_changes_options
       base.attribute_method_suffix '_delta_changed?', '_delta_change', '_delta_was', '_delta_will_change!'
-      base.send(:prepend, InstanceMethods)
+      base.prepend(InstanceMethods)
     end
 
     module ClassMethods
