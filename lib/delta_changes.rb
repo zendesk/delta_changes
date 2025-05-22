@@ -6,11 +6,7 @@ module DeltaChanges
       base.extend(ClassMethods)
       base.cattr_accessor :delta_changes_options
       base.attribute_method_suffix '_delta_changed?', '_delta_change', '_delta_was', '_delta_will_change!'
-      if ::ActiveRecord.version < Gem::Version.new('5.2')
-        base.send(:prepend, InstanceMethodsLegacy)
-      else
-        base.send(:prepend, InstanceMethods)
-      end
+      base.prepend(InstanceMethods)
     end
 
     module ClassMethods
@@ -41,29 +37,6 @@ module DeltaChanges
               attribute_delta_will_change!(tracked_attribute, *args)
             end
           end
-        end
-      end
-    end
-
-    # Rails < 5.2
-    module InstanceMethodsLegacy
-      # Wrap write_attribute to remember original attribute value.
-      def write_attribute(attr, value)
-        attr = attr.to_s
-
-        unless self.class.delta_changes_options[:columns].include?(attr)
-          return super(attr, value)
-        end
-
-        # The attribute already has an unsaved change.
-        if delta_changed_attributes.include?(attr)
-          old = delta_changed_attributes[attr]
-          super(attr, value)
-          delta_changed_attributes.delete(attr) unless delta_changes_field_changed?(attr, old, value)
-        else
-          old = respond_to?(:clone_attribute_value) ? clone_attribute_value(:read_attribute, attr) : read_attribute(attr).dup
-          super(attr, value)
-          delta_changed_attributes[attr] = old if delta_changes_field_changed?(attr, old, value)
         end
       end
     end

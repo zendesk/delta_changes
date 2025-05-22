@@ -3,4 +3,9 @@ source 'https://rubygems.org'
 gemspec path: '../'
 
 gem 'activerecord', '~> 7.0.0'
+gem 'logger'
+gem 'mutex_m'
+gem 'bigdecimal'
 gem 'sqlite3', '~> 1.4'
+
+eval_gemfile 'common.rb'

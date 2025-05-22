@@ -35,9 +35,9 @@ Testing
 
 To run tests: `$ rake spec`
 
-To run tests with a specific Rails version listed in `./gemfiles`, e.g. Rails 5.0:
+To run tests with a specific Rails version listed in `./gemfiles`, e.g. Rails 7.0:
 ```
-$ BUNDLE_GEMFILE=gemfiles/rails5.0.gemfile rake spec`
+$ BUNDLE_GEMFILE=gemfiles/rails7.0.gemfile rake spec`
 ```
 
 Author

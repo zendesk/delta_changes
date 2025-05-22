@@ -7,14 +7,7 @@ Gem::Specification.new 'delta_changes', DeltaChanges::VERSION do |s|
   s.homepage = 'http://github.com/zendesk/delta_changes'
   s.license = 'MIT'
   s.files = Dir.glob('lib/**/*')
-  s.required_ruby_version = '>= 3.0'
+  s.required_ruby_version = '>= 3.3'
 
-  s.add_runtime_dependency 'activerecord', '>= 6.0', '< 7.2'
-
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'sqlite3', '~> 1.3.6'
-  s.add_development_dependency 'bump'
-  s.add_development_dependency 'byebug'
-  s.add_development_dependency 'matching_bundle'
+  s.add_dependency 'activerecord', '>= 7.0'
 end
