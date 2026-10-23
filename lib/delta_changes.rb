@@ -1,6 +1,9 @@
 require "delta_changes/version"
+require "active_record/version"
 
 module DeltaChanges
+  AR_GTE_82 = ActiveRecord.version >= Gem::Version.new("8.2.a")
+
   module Extension
     def self.included(base)
       base.extend(ClassMethods)
@@ -12,6 +15,14 @@ module DeltaChanges
     module ClassMethods
       def delta_changes(options)
         self.delta_changes_options = options
+        if AR_GTE_82
+          # Depending on when DeltaChanges options are configured, Rails may have already generated attribute accessor
+          # methods. To make generated setters use the configured options, we remove those generated methods and reset
+          # Rails' "attribute methods generated" flag. The next time Rails calls `define_attribute_methods` (e.g. when
+          # initializing a record), our `define_method_attribute=` override will be called and use the newly configured
+          # options to decide how to generate each setter.
+          undefine_attribute_methods if options[:columns].any?
+        end
         define_virtual_attribute_delta_methods
       end
 
@@ -38,6 +49,40 @@ module DeltaChanges
             end
           end
         end
+      end
+
+      if AR_GTE_82
+        # `define_method_attribute=` is called internally by Rails to generate column setter methods. It has been
+        # updated (see commit below) to generate setters that call `@attributes.write_from_user` directly instead of
+        # `_write_attribute`. For columns listed in :columns, our override generates setters (e.g. `User#name=`)
+        # that call `_write_attribute`, which DeltaChanges overrides to track changes to the column.
+        #
+        # Ref: https://github.com/rails/rails/commit/0f6c0a05e2064b56f759677d94f060f057d89c66
+        def define_method_attribute=(canonical_name, owner:, **options)
+
+          # Calling `super` delegates setter generation to Rails. We do this in two cases: 1) if DeltaChanges options
+          # have not yet been configured, or 2) if DeltaChanges has not been configured to track the specific column
+          # referenced by `canonical_name`. In either case, Rails generates the default setter for that column.
+          # If options are changed (by way of the `delta_changes` method) with a nonempty :columns list, the generated
+          # methods are removed. These checks run again when Rails next calls `define_attribute_methods`.
+          unless delta_changes_options && delta_changes_options[:columns].include?(canonical_name)
+            return super
+          end
+
+          as = options.fetch(:as, canonical_name)
+          ActiveModel::AttributeMethods::AttrNames.define_attribute_accessor_method(
+            canonical_name, writer: true,
+          ) do |temp_method_name, attr_name_expr|
+            owner.define_cached_method(temp_method_name, as: "#{as}=", namespace: :delta_changes) do |batch|
+              batch << <<~RUBY
+                def #{temp_method_name}(value)
+                  _write_attribute(#{attr_name_expr}, value)
+                end
+              RUBY
+            end
+          end
+        end
+        private :define_method_attribute=
       end
     end
 
