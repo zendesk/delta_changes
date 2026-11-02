@@ -26,6 +26,34 @@ describe DeltaChanges do
       expect(changes).to eq('name' => [nil, 'Peter'])
     end
 
+    it 'should track column changes through an alias' do
+      user_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'users'
+        include DeltaChanges::Extension
+        alias_attribute :nickname, :name
+        delta_changes columns: %w[name], attributes: []
+      end
+
+      user = user_class.new
+      user.nickname = 'Peter'
+
+      expect(user.delta_changes).to eq('name' => [nil, 'Peter'])
+    end
+
+    it 'should track column changes when attribute methods were generated before configuration' do
+      user_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'users'
+        include DeltaChanges::Extension
+        define_attribute_methods
+        delta_changes columns: %w[name], attributes: []
+      end
+
+      user = user_class.new
+      user.name = 'Peter'
+
+      expect(user.delta_changes).to eq('name' => [nil, 'Peter'])
+    end
+
     it 'should be filled by tracked number column change' do
       changes = User.new(:score => 5).delta_changes
       expect(changes).to eq('score' => [nil, 5])
@@ -123,6 +151,34 @@ describe DeltaChanges do
 
       expect(user.audits.count).to eq(2)
       expect(user.audits.last.changes.map(&:to_h)).to eq(['score' => [5, nil]])
+    end
+  end
+
+  # Rails main generates attribute setter methods which include a readonly check. Our overrides do not. This test
+  # verifies that our replacement still rejects readonly assignments through
+  # `ActiveRecord::ReadonlyAttributes::HasReadonlyAttributes#_write_attribute`, which Rails includes when
+  # `raise_on_assign_to_attr_readonly` is `true` (which has been the default since 7.1). A rejected write must raise
+  # before changing the attribute or adding a delta. This does not apply to Rails <= 8.1.
+  #
+  # Ref: https://github.com/rails/rails/commit/0f6c0a05e2064b56f759677d94f060f057d89c66
+  if DeltaChanges::AR_GTE_82
+    describe 'generated attribute setters' do
+      it 'should not change a readonly column or track a rejected assignment' do
+        user_class = Class.new(ActiveRecord::Base) do
+          self.table_name = 'users'
+          include DeltaChanges::Extension
+          attr_readonly :name
+          delta_changes columns: %w[name], attributes: []
+        end
+
+        user = user_class.find(User.create!(:name => 'Peter').id)
+
+        expect{
+          user.name = 'Paul'
+        }.to raise_error(ActiveRecord::ReadonlyAttributeError)
+        expect(user.name).to eq('Peter')
+        expect(user.delta_changes).to eq({})
+      end
     end
   end
 end
